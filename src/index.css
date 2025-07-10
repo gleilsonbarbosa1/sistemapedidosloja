@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  body {
+    @apply antialiased text-gray-900;
+  }
+}
+
+@layer components {
+  .form-checkbox {
+    @apply rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50;
+  }
+  
+  .category-content {
+    display: block !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .category-header {
+    @apply w-full p-4 border-b bg-gray-50 flex justify-between items-center transition-colors duration-200;
+  }
+  
+  .category-header:hover {
+    @apply bg-gray-100;
+  }
+  
+  .category-icon {
+    @apply h-5 w-5 text-gray-500 transition-transform duration-200;
+  }
+  
+  .category-icon.expanded {
+    @apply transform rotate-180;
+  }
+
+  /* Mobile-friendly form inputs */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  select,
+  textarea {
+    @apply text-base sm:text-sm appearance-none;
+    min-height: 44px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+
+  /* Mobile-friendly buttons */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm;
+    min-height: 44px;
+  }
+
+  .btn-primary {
+    @apply btn bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-gray-700 border-gray-300 hover:bg-gray-50;
+  }
+
+  /* Product grid improvements */
+  .products-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Category section improvements */
+  .category-section {
+    @apply border rounded-md mb-4;
+    overflow: visible !important;
+  }
+
+  /* Product item improvements */
+  .product-item {
+    @apply border rounded-lg p-4 bg-white;
+    height: auto !important;
+  }
+
+  /* Expanded category content */
+  .expanded-content {
+    display: block !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Collapsed category content */
+  .collapsed-content {
+    display: none !important;
+    opacity: 0 !important;
+  }
+
+  /* iOS specific fixes */
+  @supports (-webkit-touch-callout: none) {
+    .category-content,
+    .products-grid,
+    .product-item,
+    .expanded-content {
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+  }
+
+  /* Mobile-friendly layout adjustments */
+  .mobile-container {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  .mobile-header {
+    @apply flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4;
+  }
+
+  .mobile-actions {
+    @apply flex flex-col sm:flex-row gap-2 w-full sm:w-auto;
+  }
+
+  .mobile-search {
+    @apply w-full sm:w-64 lg:w-96;
+  }
+
+  .mobile-filters {
+    @apply flex flex-col sm:flex-row gap-2 w-full sm:w-auto;
+  }
+
+  .mobile-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+  }
+
+  .mobile-form {
+    @apply space-y-4 sm:space-y-6;
+  }
+
+  .mobile-form-group {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+  }
+
+  .mobile-buttons {
+    @apply flex flex-col sm:flex-row gap-2;
+  }
+
+  .mobile-menu {
+    @apply fixed inset-0 z-50 bg-white transform transition-transform duration-300 ease-in-out;
+  }
+
+  .mobile-menu.open {
+    @apply translate-x-0;
+  }
+
+  .mobile-menu.closed {
+    @apply -translate-x-full;
+  }
+
+  .mobile-overlay {
+    @apply fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity duration-300;
+  }
+
+  .mobile-overlay.open {
+    @apply opacity-100;
+  }
+
+  .mobile-overlay.closed {
+    @apply opacity-0 pointer-events-none;
+  }
+}
