@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Store, Share2, Trash2, DollarSign, Search, ChevronDown, RefreshCw, Plus } from 'lucide-react';
+import { Store, Share2, Trash2, DollarSign, Search, ChevronDown } from 'lucide-react';
 import supabase from '../lib/supabase';
 import toast from 'react-hot-toast';
 import Timer from '../components/Timer';
@@ -75,15 +75,11 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('🔄 Carregando dados...');
-        
         // Fetch stores
         const { data: stores } = await supabase
           .from('stores')
           .select('*')
           .order('name');
-        
-        console.log('🏪 Lojas encontradas:', stores?.length || 0);
         
         if (stores && stores.length > 0) {
           setSelectedStore(stores[0].id);
@@ -95,17 +91,9 @@ const Dashboard: React.FC = () => {
           .select('*')
           .order('order_index');
         
-        console.log('📂 Categorias encontradas:', categories?.length || 0, categories);
-        
         if (categories) {
           setCategories(categories);
           setExpandedCategories(categories.map(cat => cat.id));
-          
-          // Se não há categorias, criar dados de exemplo
-          if (categories.length === 0) {
-            console.log('⚠️ Nenhuma categoria encontrada, criando dados de exemplo...');
-            await createSampleData();
-          }
         }
 
         // Fetch products
@@ -113,8 +101,6 @@ const Dashboard: React.FC = () => {
           .from('products')
           .select('*')
           .order('name');
-        
-        console.log('🛍️ Produtos encontrados:', products?.length || 0, products);
         
         if (products) {
           setProducts(products);
@@ -136,99 +122,6 @@ const Dashboard: React.FC = () => {
     fetchData();
   }, []);
 
-  const createSampleData = async () => {
-    try {
-      // Criar categorias de exemplo
-      const sampleCategories = [
-        { id: 'acai', name: 'Açaí', order_index: 1 },
-        { id: 'toppings', name: 'Toppings', order_index: 2 },
-        { id: 'bebidas', name: 'Bebidas', order_index: 3 },
-        { id: 'complementos', name: 'Complementos', order_index: 4 },
-        { id: 'sobremesas', name: 'Sobremesas', order_index: 5 }
-      ];
-
-      const { error: categoryError } = await supabase
-        .from('categories')
-        .insert(sampleCategories);
-
-      if (categoryError) {
-        console.error('Erro ao criar categorias:', categoryError);
-        return;
-      }
-
-      // Criar produtos de exemplo
-      const sampleProducts = [
-        // Açaí
-        { name: 'Açaí 300ml', category_id: 'acai' },
-        { name: 'Açaí 500ml', category_id: 'acai' },
-        { name: 'Açaí 700ml', category_id: 'acai' },
-        { name: 'Açaí 1L', category_id: 'acai' },
-        
-        // Toppings
-        { name: 'Granola', category_id: 'toppings' },
-        { name: 'Banana', category_id: 'toppings' },
-        { name: 'Morango', category_id: 'toppings' },
-        { name: 'Kiwi', category_id: 'toppings' },
-        { name: 'Manga', category_id: 'toppings' },
-        { name: 'Amendoim', category_id: 'toppings' },
-        { name: 'Castanha', category_id: 'toppings' },
-        { name: 'Coco Ralado', category_id: 'toppings' },
-        { name: 'Leite Condensado', category_id: 'toppings' },
-        { name: 'Mel', category_id: 'toppings' },
-        { name: 'Chocolate Granulado', category_id: 'toppings' },
-        { name: 'Paçoca', category_id: 'toppings' },
-        
-        // Bebidas
-        { name: 'Água 500ml', category_id: 'bebidas' },
-        { name: 'Refrigerante Lata', category_id: 'bebidas' },
-        { name: 'Suco Natural', category_id: 'bebidas' },
-        { name: 'Água de Coco', category_id: 'bebidas' },
-        
-        // Complementos
-        { name: 'Tapioca', category_id: 'complementos' },
-        { name: 'Crepe', category_id: 'complementos' },
-        { name: 'Sanduíche Natural', category_id: 'complementos' },
-        
-        // Sobremesas
-        { name: 'Sorvete Casquinha', category_id: 'sobremesas' },
-        { name: 'Picolé', category_id: 'sobremesas' },
-        { name: 'Milk Shake', category_id: 'sobremesas' }
-      ];
-
-      const { error: productError } = await supabase
-        .from('products')
-        .insert(sampleProducts);
-
-      if (productError) {
-        console.error('Erro ao criar produtos:', productError);
-        return;
-      }
-
-      // Recarregar dados
-      const { data: newCategories } = await supabase
-        .from('categories')
-        .select('*')
-        .order('order_index');
-      
-      const { data: newProducts } = await supabase
-        .from('products')
-        .select('*')
-        .order('name');
-
-      if (newCategories) {
-        setCategories(newCategories);
-        setExpandedCategories(newCategories.map(cat => cat.id));
-      }
-      
-      if (newProducts) {
-        setProducts(newProducts);
-      }
-
-      toast.success('Dados de exemplo criados com sucesso!');
-    } catch (error) {
-      console.error('Erro ao criar dados de exemplo:', error);
-    }
-  };
   const toggleCategory = (categoryId: string) => {
     setExpandedCategories(prev => 
       prev.includes(categoryId)
@@ -384,8 +277,7 @@ const Dashboard: React.FC = () => {
 
   const filteredProducts = searchQuery
     ? products.filter(p => 
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (categories.find(c => c.id === p.category_id)?.name || '').toLowerCase().includes(searchQuery.toLowerCase())
+        p.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : products;
 
@@ -453,20 +345,6 @@ const Dashboard: React.FC = () => {
                 Limpar
               </button>
               <button 
-                onClick={() => window.location.reload()}
-                className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 uppercase"
-              >
-                <RefreshCw className="h-5 w-5 mr-2" />
-                Recarregar
-              </button>
-              <button 
-                onClick={createSampleData}
-                className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 uppercase"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Criar Dados Exemplo
-              </button>
-              <button 
                 onClick={saveDraft}
                 className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 uppercase"
               >
@@ -494,20 +372,6 @@ const Dashboard: React.FC = () => {
 
       {/* Main content */}
       <div className="container mx-auto px-4 py-6">
-        {/* Debug Info */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-          <h3 className="text-sm font-semibold text-yellow-800 mb-2">Debug Info:</h3>
-          <div className="text-xs text-yellow-700 space-y-1">
-            <p>Categorias carregadas: {categories.length}</p>
-            <p>Produtos carregados: {products.length}</p>
-            <p>Produtos filtrados: {filteredProducts.length}</p>
-            <p>Categorias expandidas: {expandedCategories.length}</p>
-            {categories.length > 0 && (
-              <p>Categorias: {categories.map(c => c.name).join(', ')}</p>
-            )}
-          </div>
-        </div>
-        
         <div className="bg-white rounded-lg p-4 shadow-lg">
           {/* Search bar */}
           <div className="mb-6">
@@ -533,19 +397,17 @@ const Dashboard: React.FC = () => {
                 <div key={category.id} className="border rounded-md">
                   <button
                     onClick={() => toggleCategory(category.id)}
-                    className="w-full px-4 py-3 flex items-center justify-between bg-purple-50 hover:bg-purple-100 transition-colors rounded-t-md border-b"
+                    className="w-full px-4 py-3 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors rounded-t-md"
                   >
-                    <h3 className="text-lg font-semibold uppercase text-purple-800">{category.name}</h3>
+                    <h3 className="text-lg font-semibold uppercase">{category.name}</h3>
                     <ChevronDown 
-                      className={`h-5 w-5 text-purple-600 transition-transform duration-200 ${
+                      className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
                         expandedCategories.includes(category.id) ? 'transform rotate-180' : ''
                       }`}
                     />
                   </button>
                   
-                  <div className={`transition-all duration-300 overflow-hidden ${
-                    expandedCategories.includes(category.id) ? 'max-h-none opacity-100' : 'max-h-0 opacity-0'
-                  }`}>
+                  {expandedCategories.includes(category.id) && (
                     <div className="p-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {categoryProducts.map(product => {
@@ -558,7 +420,7 @@ const Dashboard: React.FC = () => {
                           };
 
                           return (
-                            <div key={product.id} className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
+                            <div key={product.id} className="border rounded-lg p-4">
                               <div className="flex items-center justify-between mb-3">
                                 <label className="flex items-center space-x-3">
                                   <input
@@ -567,7 +429,7 @@ const Dashboard: React.FC = () => {
                                     onChange={(e) => handleItemChange(product.id, 'quantity', e.target.checked ? 1 : 0)}
                                     className="form-checkbox h-5 w-5 text-purple-600"
                                   />
-                                  <span className="text-gray-800 font-medium uppercase text-sm">{product.name}</span>
+                                  <span className="text-gray-700 font-medium uppercase">{product.name}</span>
                                 </label>
                                 {item.quantity > 0 && (
                                   <div className="flex items-center space-x-2">
@@ -652,22 +514,10 @@ const Dashboard: React.FC = () => {
                         })}
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               );
             })}
-            
-            {/* Show message if no products found */}
-            {filteredProducts.length === 0 && (
-              <div className="text-center py-8 bg-white rounded-lg border">
-                <p className="text-gray-500 text-lg">Nenhum produto encontrado</p>
-                {searchQuery && (
-                  <p className="text-gray-400 text-sm mt-2">
-                    Tente buscar por "{searchQuery}" ou limpe a busca
-                  </p>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Checklist Section */}
