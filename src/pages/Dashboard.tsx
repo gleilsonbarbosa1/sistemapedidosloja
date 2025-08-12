@@ -290,9 +290,9 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-purple-600">
+    <div className="min-h-screen bg-purple-600 main-content">
       {/* Header */}
-      <div className="bg-purple-600">
+      <div className="bg-purple-600 pb-4">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
             <div className="flex items-center text-white w-full sm:w-auto">
@@ -371,7 +371,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Main content */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 pb-20 mobile-spacing">
         <div className="bg-white rounded-lg p-4 shadow-lg">
           {/* Search bar */}
           <div className="mb-6">
@@ -394,10 +394,10 @@ const Dashboard: React.FC = () => {
               if (categoryProducts.length === 0) return null;
 
               return (
-                <div key={category.id} className="border rounded-md">
+                <div key={category.id} className="border rounded-md overflow-visible">
                   <button
                     onClick={() => toggleCategory(category.id)}
-                    className="w-full px-4 py-3 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors rounded-t-md"
+                    className="w-full px-4 py-3 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors rounded-t-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                   >
                     <h3 className="text-lg font-semibold uppercase">{category.name}</h3>
                     <ChevronDown 
@@ -408,7 +408,7 @@ const Dashboard: React.FC = () => {
                   </button>
                   
                   {expandedCategories.includes(category.id) && (
-                    <div className="p-4">
+                    <div className="p-4 overflow-visible">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {categoryProducts.map(product => {
                           const item = orderItems[product.id] || {
@@ -420,7 +420,7 @@ const Dashboard: React.FC = () => {
                           };
 
                           return (
-                            <div key={product.id} className="border rounded-lg p-4">
+                            <div key={product.id} className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
                               <div className="flex items-center justify-between mb-3">
                                 <label className="flex items-center space-x-3">
                                   <input
@@ -452,7 +452,7 @@ const Dashboard: React.FC = () => {
 
                               {item.quantity > 0 && (
                                 <div className="space-y-3">
-                                  <div className="flex flex-wrap gap-4">
+                                  <div className="flex flex-wrap gap-2 sm:gap-4">
                                     <label className="flex items-center space-x-2">
                                       <input
                                         type="radio"
@@ -521,18 +521,18 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Checklist Section */}
-          <div className="mt-6 bg-gray-50 rounded-lg p-4">
+          <div className="mt-8 bg-gray-50 rounded-lg p-4 border checklist-section">
             <h3 className="text-lg font-semibold mb-4 uppercase">Checklist de Fechamento</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
                 <h4 className="font-medium mb-2 uppercase">Verificações Gerais</h4>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="flex items-center space-x-3">
                     <input
                       type="checkbox"
                       checked={checklist.ar_desligado}
                       onChange={() => handleChecklistChange('ar_desligado')}
-                      className="form-checkbox h-5 w-5 text-purple-600"
+                      className="form-checkbox h-5 w-5 text-purple-600 flex-shrink-0"
                     />
                     <span className="uppercase">Ar-condicionado desligado</span>
                   </label>
@@ -541,7 +541,7 @@ const Dashboard: React.FC = () => {
                       type="checkbox"
                       checked={checklist.freezer_fechado}
                       onChange={() => handleChecklistChange('freezer_fechado')}
-                      className="form-checkbox h-5 w-5 text-purple-600"
+                      className="form-checkbox h-5 w-5 text-purple-600 flex-shrink-0"
                     />
                     <span className="uppercase">Freezer fechado</span>
                   </label>
@@ -550,7 +550,7 @@ const Dashboard: React.FC = () => {
                       type="checkbox"
                       checked={checklist.lixo_retirado}
                       onChange={() => handleChecklistChange('lixo_retirado')}
-                      className="form-checkbox h-5 w-5 text-purple-600"
+                      className="form-checkbox h-5 w-5 text-purple-600 flex-shrink-0"
                     />
                     <span className="uppercase">Lixo retirado</span>
                   </label>
@@ -559,7 +559,7 @@ const Dashboard: React.FC = () => {
                       type="checkbox"
                       checked={checklist.piso_limpo}
                       onChange={() => handleChecklistChange('piso_limpo')}
-                      className="form-checkbox h-5 w-5 text-purple-600"
+                      className="form-checkbox h-5 w-5 text-purple-600 flex-shrink-0"
                     />
                     <span className="uppercase">Piso limpo</span>
                   </label>
@@ -568,7 +568,7 @@ const Dashboard: React.FC = () => {
                       type="checkbox"
                       checked={checklist.luzes_apagadas}
                       onChange={() => handleChecklistChange('luzes_apagadas')}
-                      className="form-checkbox h-5 w-5 text-purple-600"
+                      className="form-checkbox h-5 w-5 text-purple-600 flex-shrink-0"
                     />
                     <span className="uppercase">Luzes apagadas</span>
                   </label>
@@ -577,7 +577,7 @@ const Dashboard: React.FC = () => {
 
               <div>
                 <h4 className="font-medium mb-2 uppercase">Limpeza e Organização</h4>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="flex items-center space-x-3">
                     <input
                       type="checkbox"
@@ -628,7 +628,7 @@ const Dashboard: React.FC = () => {
 
               <div>
                 <h4 className="font-medium mb-2 uppercase">Verificações Finais</h4>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="flex items-center space-x-3">
                     <input
                       type="checkbox"
