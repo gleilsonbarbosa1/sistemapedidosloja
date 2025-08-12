@@ -54,6 +54,7 @@ const Dashboard: React.FC = () => {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const [orderItems, setOrderItems] = useState<Record<string, OrderItem>>({});
   const [loading, setLoading] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
   const [checklist, setChecklist] = useState<ChecklistState>({
     ar_desligado: false,
     freezer_fechado: false,
@@ -74,7 +75,43 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setDataError(null);
+      
       try {
+        console.log('Starting data fetch...');
+        
+        // Fetch categories
+        const { data: categories, error: categoriesError } = await supabase
+          .from('categories')
+          .select('*')
+          .order('order_index');
+        
+        if (categoriesError) {
+          console.error('Error fetching categories:', categoriesError);
+          setDataError(`Erro ao carregar categorias: ${categoriesError.message}`);
+          return;
+        }
+        
+        console.log('Categories loaded:', categories);
+        setCategories(categories || []);
+        setExpandedCategories((categories || []).map(cat => cat.id));
+
+        // Fetch products
+        const { data: products, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .order('name');
+        
+        if (productsError) {
+          console.error('Error fetching products:', productsError);
+          setDataError(`Erro ao carregar produtos: ${productsError.message}`);
+          return;
+        }
+        
+        console.log('Products loaded:', products);
+        setProducts(products || []);
+
         // Fetch stores
         const { data: stores } = await supabase
           .from('stores')
@@ -85,27 +122,6 @@ const Dashboard: React.FC = () => {
           setSelectedStore(stores[0].id);
         }
 
-        // Fetch categories
-        const { data: categories } = await supabase
-          .from('categories')
-          .select('*')
-          .order('order_index');
-        
-        if (categories) {
-          setCategories(categories);
-          setExpandedCategories(categories.map(cat => cat.id));
-        }
-
-        // Fetch products
-        const { data: products } = await supabase
-          .from('products')
-          .select('*')
-          .order('name');
-        
-        if (products) {
-          setProducts(products);
-        }
-
         // Load saved draft
         const savedDraft = localStorage.getItem('orderDraft');
         if (savedDraft) {
@@ -113,7 +129,7 @@ const Dashboard: React.FC = () => {
         }
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
-        toast.error('Erro ao carregar dados');
+        setDataError(`Erro geral: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
       } finally {
         setLoading(false);
       }
@@ -284,7 +300,30 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-purple-600 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+        <div className="text-center text-white">
+          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Carregando dados...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (dataError) {
+    return (
+      <div className="min-h-screen bg-purple-600 flex items-center justify-center">
+        <div className="text-center text-white max-w-md mx-auto p-6">
+          <div className="bg-red-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">⚠️</span>
+          </div>
+          <h2 className="text-xl font-bold mb-2">Erro ao Carregar Dados</h2>
+          <p className="mb-4">{dataError}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-white text-purple-600 px-4 py-2 rounded-md hover:bg-gray-100"
+          >
+            Tentar Novamente
+          </button>
+        </div>
       </div>
     );
   }
@@ -389,9 +428,17 @@ const Dashboard: React.FC = () => {
 
           {/* Categories and Products */}
           <div className="space-y-4">
+            {categories.length === 0 && !loading && (
+              <div className="text-center py-8 text-gray-500">
+                <p>Nenhuma categoria encontrada.</p>
+                <p className="text-sm mt-2">Verifique se as categorias estão cadastradas no banco de dados.</p>
+              </div>
+            )}
+            
             {categories.map(category => {
               const categoryProducts = filteredProducts.filter(p => p.category_id === category.id);
-              if (categoryProducts.length === 0) return null;
+              
+              console.log(`Category ${category.name}:`, categoryProducts);
 
               return (
                 <div key={category.id} className="border rounded-md overflow-visible">
@@ -409,6 +456,11 @@ const Dashboard: React.FC = () => {
                   
                   {expandedCategories.includes(category.id) && (
                     <div className="p-4 overflow-visible">
+                      {categoryProducts.length === 0 ? (
+                        <div className="text-center py-4 text-gray-500">
+                          <p>Nenhum produto encontrado nesta categoria.</p>
+                        </div>
+                      ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {categoryProducts.map(product => {
                           const item = orderItems[product.id] || {
@@ -513,11 +565,23 @@ const Dashboard: React.FC = () => {
                           );
                         })}
                       </div>
+                      )}
                     </div>
                   )}
                 </div>
               );
             })}
+            
+            {/* Debug information - remove in production */}
+            {!loading && (
+              <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
+                <p><strong>Debug Info:</strong></p>
+                <p>Total categorias: {categories.length}</p>
+                <p>Total produtos: {products.length}</p>
+                <p>Produtos filtrados: {filteredProducts.length}</p>
+                <p>Busca ativa: "{searchQuery}"</p>
+              </div>
+            )}
           </div>
 
           {/* Checklist Section */}
