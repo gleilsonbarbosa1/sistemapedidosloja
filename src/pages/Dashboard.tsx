@@ -281,6 +281,11 @@ const Dashboard: React.FC = () => {
       )
     : products;
 
+  // Debug: Log categories and products to console
+  console.log('Categories:', categories);
+  console.log('Products:', products);
+  console.log('Filtered Products:', filteredProducts);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-purple-600 flex items-center justify-center">
@@ -391,6 +396,10 @@ const Dashboard: React.FC = () => {
           <div className="space-y-4">
             {categories.map(category => {
               const categoryProducts = filteredProducts.filter(p => p.category_id === category.id);
+              
+              // Debug: Log category and its products
+              console.log(`Category ${category.name} (${category.id}):`, categoryProducts);
+              
               if (categoryProducts.length === 0) return null;
 
               return (
